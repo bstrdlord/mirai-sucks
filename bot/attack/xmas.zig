@@ -32,12 +32,12 @@ pub fn _xmas(dst_ip: [4]u8, port: u16) void {
 
     const ip_h = IpHeader.init(dst_ip, 0x06).marshal();
     var psd_h = PsdHeader.init(dst_ip, 0x06);
-    var tcp_h = TcpHeader.init(port, 0x01 | 0x20 | 0x08);
+    var tcp_h = TcpHeader.init(port, 0x3f); // all flags
 
     const packet = assemble.packet(ip_h, &tcp_h, &psd_h);
 
     _ = helpers.sendto(@intCast(fd), &packet, packet.len, linux.MSG.NOSIGNAL, &sockaddr.any, @intCast(@as(linux.socklen_t, sockaddr.getOsSockLen()))) catch |err| {
-        std.debug.print("haha {s}", .{@errorName(err)});
+        std.debug.print("err {s}", .{@errorName(err)});
         return;
     };
 }
