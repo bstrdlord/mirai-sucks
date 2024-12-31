@@ -4,6 +4,8 @@ I decided to start this project cause script kiddies are selling shitty mirai sr
 
 btw: this project was written in two days from scratch, hahaha.
 
+feel free to create issues and contribute
+
 ## Killer 
 the killer principle is very simple. It's very boring to do, so maybe I'll do something, but you can easily add on to it.
 
