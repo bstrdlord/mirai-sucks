@@ -156,6 +156,49 @@ pub fn sendto(fd: i32, buf: [*]const u8, len: usize, flags: u32, addr: ?*const s
     }
 }
 
+pub fn bind(fd: i32, addr: *const std.os.linux.sockaddr, len: std.os.linux.socklen_t) !void {
+    const rc = std.os.linux.bind(fd, addr, len);
+    switch (_errno(rc)) {
+        .SUCCESS => return,
+        .ACCES, .PERM => return error.AccessDenied,
+        .ADDRINUSE => return error.AddressInUse,
+        .BADF => unreachable, // always a race condition if this error is returned
+        .INVAL => unreachable, // invalid parameters
+        .NOTSOCK => unreachable, // invalid `sockfd`
+        .AFNOSUPPORT => return error.AddressFamilyNotSupported,
+        .ADDRNOTAVAIL => return error.AddressNotAvailable,
+        .FAULT => unreachable, // invalid `addr` pointer
+        .LOOP => return error.SymLinkLoop,
+        .NAMETOOLONG => return error.NameTooLong,
+        .NOENT => return error.FileNotFound,
+        .NOMEM => return error.SystemResources,
+        .NOTDIR => return error.NotDir,
+        .ROFS => return error.ReadOnlyFileSystem,
+        else => |err| return std.posix.unexpectedErrno(err),
+    }
+}
+pub fn listen(fd: i32, backlog: u32) !void {
+    const rc = std.os.linux.listen(fd, backlog);
+    switch (_errno(rc)) {
+        .SUCCESS => return,
+        .ADDRINUSE => return error.AddressInUse,
+        .BADF => unreachable,
+        .NOTSOCK => return error.FileDescriptorNotASocket,
+        .OPNOTSUPP => return error.OperationNotSupported,
+        else => |err| return std.posix.unexpectedErrno(err),
+    }
+}
+
+pub fn kill(pid: i32, sig: i32) !void {
+    switch (_errno(std.os.linux.kill(pid, sig))) {
+        .SUCCESS => return,
+        .INVAL => unreachable, // invalid signal
+        .PERM => return error.PermissionDenied,
+        .SRCH => return error.ProcessNotFound,
+        else => |err| return std.posix.unexpectedErrno(err),
+    }
+}
+
 pub fn randomIp() [4]u8 {
     return [4]u8{ randomInt(u8, 0, 255), randomInt(u8, 0, 255), randomInt(u8, 0, 255), randomInt(u8, 0, 255) };
 }
@@ -177,4 +220,13 @@ pub fn parseIp(ip_str: []const u8) [4]u8 {
     }
     parsed_ip[idx] = current_value;
     return parsed_ip;
+}
+
+pub fn parseHexToU16(hex: []const u8) !u16 {
+    var value: u16 = 0;
+    for (hex, 0..) |char, idx| {
+        const digit = try std.fmt.parseInt(u16, &[_]u8{char}, 16);
+        value |= digit << (@intCast((hex.len - idx - 1) * 4));
+    }
+    return value;
 }
