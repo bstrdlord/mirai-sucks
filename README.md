@@ -7,7 +7,7 @@ btw: this project was written in two days from scratch, hahaha.
 feel free to create issues and contribute
 
 ## Killer 
-the killer principle is very simple. It's very boring to do, so maybe I'll do something, but you can easily add on to it.
+the killer principle is very simple. I wrote a very simple [killer](https://github.com/bstrdlord/mirai-sucks/blob/main/bot/Killer.zig) (kill by port, rebind ports), cause it's very boring to do, but you can easily add on to it.
 
 [Mirai sources (u can find killers there)](https://github.com/R00tS3c/DDOS-RootSec/tree/master/Botnets/Mirai)
 
@@ -27,6 +27,7 @@ Simple [caller](https://github.com/bstrdlord/mirai-sucks/blob/main/bot/attack/Ca
 ## Demo 
 I didn't work on the design
 ![image](https://github.com/user-attachments/assets/59b73093-9ea5-4f16-8ef6-c2d1afd7ee2b)
+![image](https://github.com/user-attachments/assets/841480c4-eec0-4f36-bfa4-a97e17615c7a)
 
 
 ## Script kiddies 

@@ -54,19 +54,16 @@ func (h Handler) keepAlive() {
 	for {
 		n, err := h.bot.Conn.Read(b)
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 
 		_, err = h.bot.Conn.Write(b[0:n])
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 
 		_, err = io.Copy(h.bot.Conn, h.bot.Conn)
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 	}
