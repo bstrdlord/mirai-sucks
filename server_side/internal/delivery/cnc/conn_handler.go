@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"strings"
 )
 
 func (h *Handler) RunConnHandler(conn net.Conn) {
@@ -31,7 +32,16 @@ func (h *Handler) RunConnHandler(conn net.Conn) {
 
 		// payload := h.services.Encrypter.Encrypt(cmd, h.services.Encrypter.RandKey())
 
-		// h.services.Broadcaster.Broadcast(payload)
+		// TODO: refactor
+		if strings.Contains(cmd, "bots") {
+			var final string
+
+			final += fmt.Sprintf("Total: %d\n", h.services.BotCache.Len())
+
+			final += h.services.Cmds.GetBots()
+			conn.Write([]byte(final))
+			continue
+		}
 
 		payloadString, isMethod, err := h.services.Parser.Parse(cmd)
 		if err != nil {

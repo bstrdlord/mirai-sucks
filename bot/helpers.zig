@@ -23,30 +23,54 @@ fn _errno(rc: anytype) std.os.linux.E {
     return @enumFromInt(int);
 }
 
-pub fn errno(res: usize) !void {
-    switch (_errno(res)) {
-        .SUCCESS => return,
-        .ACCES => return error.PermissionDenied,
-        .PERM => return error.PermissionDenied,
-        .ADDRINUSE => return error.AddressInUse,
-        .ADDRNOTAVAIL => return error.AddressNotAvailable,
-        .AFNOSUPPORT => return error.AddressFamilyNotSupported,
-        .AGAIN, .INPROGRESS => return error.WouldBlock,
-        .ALREADY => return error.ConnectionPending,
-        .BADF => unreachable, // sockfd is not a valid open file descriptor.
-        .CONNREFUSED => return error.ConnectionRefused,
-        .CONNRESET => return error.ConnectionResetByPeer,
-        .FAULT => unreachable, // The socket structure address is outside the user's address space.
-        .INTR => std.debug.print("INTR", .{}),
-        .ISCONN => unreachable, // The socket is already connected.
-        .HOSTUNREACH => return error.NetworkUnreachable,
-        .NETUNREACH => return error.NetworkUnreachable,
-        .NOTSOCK => unreachable, // The file descriptor sockfd does not refer to a socket.
-        .PROTOTYPE => unreachable, // The socket type does not support the requested communications protocol.
-        .TIMEDOUT => return error.ConnectionTimedOut,
-        .NOENT => return error.FileNotFound, // Returned when socket is AF.UNIX and the given path does not exist.
-        .CONNABORTED => unreachable, // Tried to reuse socket that previously received error.ConnectionRefused.
-        else => |err| return std.posix.unexpectedErrno(err),
+pub fn recvfrom(fd: i32, noalias buf: [*]u8, len: usize, flags: u32, noalias addr: ?*std.os.linux.sockaddr, noalias alen: ?*std.os.linux.socklen_t) !usize {
+    while (true) {
+        const rc = std.os.linux.recvfrom(fd, buf, len, flags, addr, alen);
+        switch (_errno(rc)) {
+            .SUCCESS => return @intCast(rc),
+            .BADF => unreachable, // always a race condition
+            .FAULT => unreachable,
+            .INVAL => unreachable,
+            .NOTCONN => return error.SocketNotConnected,
+            .NOTSOCK => unreachable,
+            .INTR => continue,
+            .AGAIN => return error.WouldBlock,
+            .NOMEM => return error.SystemResources,
+            .CONNREFUSED => return error.ConnectionRefused,
+            .CONNRESET => return error.ConnectionResetByPeer,
+            .TIMEDOUT => return error.ConnectionTimedOut,
+            else => |err| return std.posix.unexpectedErrno(err),
+        }
+    }
+}
+
+pub fn connect(fd: i32, addr: *const anyopaque, len: std.os.linux.socklen_t) !void {
+    while (true) {
+        const rc = std.os.linux.connect(fd, addr, len);
+        switch (_errno(rc)) {
+            .SUCCESS => return,
+            .ACCES => return error.PermissionDenied,
+            .PERM => return error.PermissionDenied,
+            .ADDRINUSE => return error.AddressInUse,
+            .ADDRNOTAVAIL => return error.AddressNotAvailable,
+            .AFNOSUPPORT => return error.AddressFamilyNotSupported,
+            .AGAIN, .INPROGRESS => return error.WouldBlock,
+            .ALREADY => return error.ConnectionPending,
+            .BADF => unreachable, // sockfd is not a valid open file descriptor.
+            .CONNREFUSED => return error.ConnectionRefused,
+            .CONNRESET => return error.ConnectionResetByPeer,
+            .FAULT => unreachable, // The socket structure address is outside the user's address space.
+            .INTR => continue,
+            .ISCONN => unreachable, // The socket is already connected.
+            .HOSTUNREACH => return error.NetworkUnreachable,
+            .NETUNREACH => return error.NetworkUnreachable,
+            .NOTSOCK => unreachable, // The file descriptor sockfd does not refer to a socket.
+            .PROTOTYPE => unreachable, // The socket type does not support the requested communications protocol.
+            .TIMEDOUT => return error.ConnectionTimedOut,
+            .NOENT => return error.FileNotFound, // Returned when socket is AF.UNIX and the given path does not exist.
+            .CONNABORTED => unreachable, // Tried to reuse socket that previously received error.ConnectionRefused.
+            else => |err| return std.posix.unexpectedErrno(err),
+        }
     }
 }
 

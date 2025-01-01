@@ -54,6 +54,9 @@ func (s *ParserService) Parse(payload string) (string, bool, error) {
 	}
 
 	for _, command := range domain.CommandsMap {
+		fmt.Println(command.Name)
+		fmt.Println(cmdName)
+
 		if command.Name == cmdName {
 			return "", false, nil
 		}

@@ -33,3 +33,13 @@ func (s *CacheService) Has(key string) bool {
 func (s *CacheService) Range(f func(key, value any) bool) {
 	s.storage.Range(f)
 }
+
+func (s *CacheService) Len() uint64 {
+	var len uint64
+	s.storage.Range(func(_, _ any) bool {
+		len++
+		return true
+	})
+
+	return len
+}

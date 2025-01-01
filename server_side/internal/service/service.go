@@ -11,6 +11,10 @@ type Encrypter interface {
 	RandKey() int
 }
 
+type Cmds interface {
+	GetBots() string
+}
+
 type Parser interface {
 	Parse(payload string) (string, bool, error)
 }
@@ -25,6 +29,7 @@ type Cache interface {
 	Delete(key string)
 	Has(key string) bool
 	Range(f func(key, value any) bool)
+	Len() uint64
 }
 
 type Broadcaster interface {
@@ -37,6 +42,7 @@ type Services struct {
 	BotCache    Cache
 	Broadcaster Broadcaster
 	Encrypter   Encrypter
+	Cmds        Cmds
 }
 
 func NewServices() *Services {
@@ -48,12 +54,15 @@ func NewServices() *Services {
 	broadcaster := NewBroadcastService(botCache)
 	encrypter := NewEncService()
 
+	cmds := NewCmdsService(botCache)
+
 	return &Services{
 		Parser:      parser,
 		Term:        term,
 		BotCache:    botCache,
 		Broadcaster: broadcaster,
 		Encrypter:   encrypter,
+		Cmds:        cmds,
 	}
 
 }
