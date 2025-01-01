@@ -89,7 +89,7 @@ pub fn connect() !void {
             //     continue;
             // };
 
-            const n = std.posix.recvfrom(@intCast(fd), &buf, 0, null, null) catch |err| {
+            const n = helpers.recvfrom(@intCast(fd), &buf, 0, null, null) catch |err| {
                 std.debug.print("recv err: {s}\n", .{@errorName(err)});
                 continue;
             };

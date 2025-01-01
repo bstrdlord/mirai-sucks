@@ -3,6 +3,7 @@ package bot
 import (
 	"bytes"
 	"fmt"
+	"servers/domain"
 	"strings"
 	"time"
 )
@@ -46,18 +47,18 @@ func (h *Handler) botHello() {
 	fmt.Println("ARCH", msgDecrypted[1])
 
 	// disconnect bot if already connected
-	// h.services.BotCache.Range(func(_, value any) bool {
-	// 	v, err := domain.SafeCast[domain.Bot](value)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
+	h.services.BotCache.Range(func(_, value any) bool {
+		v, err := domain.SafeCast[domain.Bot](value)
+		if err != nil {
+			panic(err)
+		}
 
-	// 	if v.Ip == h.bot.Ip {
-	// 		h.Disconnect()
-	// 		return false
-	// 	}
-	// 	return true
-	// })
+		if v.Ip == h.bot.Ip {
+			h.Disconnect()
+			return false
+		}
+		return true
+	})
 
 	h.bot.Conn.SetDeadline(time.Time{})
 
