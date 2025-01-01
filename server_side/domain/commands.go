@@ -25,6 +25,10 @@ var MethodsMap = map[uint8]Method{
 		Name:        "xmas",
 		Description: "sends TCP packets with all flags set",
 	},
+	1: {
+		Name:        "udp",
+		Description: "udp flood (not spoofed)",
+	},
 }
 
 var CommandsMap = map[uint8]Command{

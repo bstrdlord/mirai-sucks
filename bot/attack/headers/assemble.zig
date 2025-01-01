@@ -4,6 +4,8 @@ const TcpHeader = @import("TcpHeader.zig");
 const PsdHeader = @import("PsdHeader.zig");
 const IpHeader = @import("IpHeader.zig");
 
+const helpers = @import("../../helpers.zig");
+
 /// assemble packet
 pub fn packet(ip_h_bytes: [20]u8, tcp_h: *TcpHeader, psd_h: *PsdHeader) [40]u8 {
 
@@ -35,4 +37,14 @@ pub fn packet(ip_h_bytes: [20]u8, tcp_h: *TcpHeader, psd_h: *PsdHeader) [40]u8 {
     std.mem.copyForwards(u8, fin_buf[ip_h_bytes.len..tcp_hdr.len], &tcp_hdr);
 
     return fin_buf;
+}
+
+pub fn payload(comptime len: usize) []u8 {
+    var buf: [len]u8 = undefined;
+
+    std.posix.getrandom(&buf) catch |err| {
+        std.debug.print("err {s}\n", .{@errorName(err)});
+    };
+
+    return &buf;
 }

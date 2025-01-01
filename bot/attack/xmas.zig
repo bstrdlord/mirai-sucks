@@ -11,8 +11,8 @@ const linux = std.os.linux;
 
 const assemble = @import("headers/assemble.zig");
 
-pub fn xmas(dst_ip: [4]u8, port: u16, duration: u32) void {
-    const c = Caller.init(std.heap.page_allocator, 5, duration, @constCast(&_xmas), .{ .ip = dst_ip, .port = port });
+pub fn xmas(allocator: std.mem.Allocator, dst_ip: [4]u8, port: u16, duration: u32) void {
+    const c = Caller.init(allocator, 5, duration, @constCast(&_xmas), .{ .ip = dst_ip, .port = port });
 
     c.call();
 }

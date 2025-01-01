@@ -13,11 +13,17 @@ the killer principle is very simple. I wrote a very simple [killer](https://gith
 
 ## Methods 
 
-So far i've only written one method (xmas), but I've written a handy [api](https://github.com/bstrdlord/mirai-sucks/tree/main/bot/attack/headers) for writing methods
+So far i've only written xmas and udp methods, but I've written a handy [api](https://github.com/bstrdlord/mirai-sucks/tree/main/bot/attack/headers) for writing methods
 
 ### xmas method (spoofed)
 All flags are set and ip is spoofed. ([src](https://github.com/bstrdlord/mirai-sucks/blob/main/bot/attack/xmas.zig))
 ![image](https://github.com/user-attachments/assets/6a77f8be-322f-47f3-9a22-95242ec290d0)
+
+### udp method (not spoofed)
+[src](https://github.com/bstrdlord/mirai-sucks/blob/main/bot/attack/udp.zig)
+
+![image](https://github.com/user-attachments/assets/332f2bd9-0311-42a7-8e93-91f64b4631ea)
+
 
 
 
@@ -27,6 +33,8 @@ Simple [caller](https://github.com/bstrdlord/mirai-sucks/blob/main/bot/attack/Ca
 ## Demo 
 I didn't work on the design
 ![image](https://github.com/user-attachments/assets/59b73093-9ea5-4f16-8ef6-c2d1afd7ee2b)
+![image](https://github.com/user-attachments/assets/73d9d9ea-9d89-44d1-b983-e099ef5ce93c)
+
 ![image](https://github.com/user-attachments/assets/841480c4-eec0-4f36-bfa4-a97e17615c7a)
 
 
