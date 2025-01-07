@@ -21,7 +21,7 @@ func (h *Handler) botHello() {
 	}
 
 	parts := bytes.Split(b[:n], []byte("|"))
-	if len(parts) < 1 {
+	if len(parts) <= 1 {
 		fmt.Println("[BOT] Error: Invalid hello msg")
 		return
 	}
