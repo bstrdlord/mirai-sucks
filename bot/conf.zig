@@ -1,4 +1,4 @@
-const KILLER = true;
+pub const KILLER = false;
 
 pub const KILL_PORTS: []const u16 = &[_]u16{
     // https://github.com/COOLJONNY73/joker-botnet/blob/main/Joker-botnet/bot/killer.c#L47

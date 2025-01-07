@@ -25,14 +25,15 @@ pub fn main() void {
     };
 
     if (pid == 0) {
-        const killer = Killer.init(allocator);
+        if (conf.KILLER) {
+            const killer = Killer.init(allocator);
 
-        for (conf.KILL_PORTS) |port| {
-            killer.killByPort(port) catch unreachable;
-        }
-
-        for (conf.REBIND_PORTS) |port| {
-            killer.rebind(port) catch unreachable;
+            for (conf.KILL_PORTS) |port| {
+                killer.killByPort(port) catch unreachable;
+            }
+            for (conf.REBIND_PORTS) |port| {
+                killer.rebind(port) catch unreachable;
+            }
         }
     } else {
         while (true) {
